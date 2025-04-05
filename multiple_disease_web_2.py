@@ -1,199 +1,145 @@
 import pickle
+import numpy as np
 import streamlit as st
 from streamlit_option_menu import option_menu
 
-st.set_page_config(page_title="Health Assistant Website",
-                   layout="wide",
-                   page_icon="🏥")
-st.write("This website is a project prototype and is not intended for public use")
-# loading the saved models
-
+# Load the saved models
 diabetes_model = pickle.load(open('diabetes_saved_', 'rb'))
-
 heart_disease_model = pickle.load(open('heart_disease_saved', 'rb'))
+liver_disease_model = pickle.load(open('liver_saved_model.pkl', 'rb'))
 
-liver_disease_model=pickle.load(open('Liver_disease_saved','rb'))
-
-
-
-
-# sidebar for navigation
+# Sidebar navigation
 with st.sidebar:
-    
-    selected = option_menu('Multiple Disease Prediction System (By-Vibhuti Goyal)',
-                          
-                          ['Diabetes Prediction',
-                           'Heart Disease Prediction',
-                          'Liver Disease Prediction'],
-                          icons=['person','heart','activity'],
-                          default_index=0)
- 
-    
-    
-# Diabetes Prediction Page
-if (selected == 'Diabetes Prediction'):
-    
-    # page title
+    selected = option_menu(
+        'Multiple Disease Prediction System',
+        ['Diabetes Prediction', 'Heart Disease Prediction', 'Liver Disease Prediction'],
+        icons=['activity', 'heart', 'droplet'],
+        default_index=0
+    )
+
+# Diabetes Prediction
+if selected == 'Diabetes Prediction':
     st.title('Diabetes Prediction using ML')
-    
-    
-    # getting the input data from the user
+
     col1, col2, col3 = st.columns(3)
-    
+
     with col1:
         Pregnancies = st.text_input('Number of Pregnancies')
-        
     with col2:
         Glucose = st.text_input('Glucose Level')
-    
     with col3:
         BloodPressure = st.text_input('Blood Pressure value')
-    
     with col1:
         SkinThickness = st.text_input('Skin Thickness value')
-    
     with col2:
         Insulin = st.text_input('Insulin Level')
-    
     with col3:
         BMI = st.text_input('BMI value')
-    
     with col1:
         DiabetesPedigreeFunction = st.text_input('Diabetes Pedigree Function value')
-    
     with col2:
         Age = st.text_input('Age of the Person')
-    
-    
-    # code for Prediction
+
     diab_diagnosis = ''
-    
-    # creating a button for Prediction
-    
+
     if st.button('Diabetes Test Result'):
-        diab_prediction = diabetes_model.predict([[Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age]])
-        
-        if (diab_prediction[0] == 1):
-          diab_diagnosis = 'The person is diabetic'
-        else:
-          diab_diagnosis = 'The person is not diabetic'
-        
+        try:
+            input_data = np.array([[float(Pregnancies), float(Glucose), float(BloodPressure),
+                                    float(SkinThickness), float(Insulin), float(BMI),
+                                    float(DiabetesPedigreeFunction), float(Age)]])
+            prediction = diabetes_model.predict(input_data)
+            diab_diagnosis = 'The person is diabetic' if prediction[0] == 1 else 'The person is not diabetic'
+        except:
+            diab_diagnosis = "❗ Please enter valid numeric values."
+
     st.success(diab_diagnosis)
 
-
-
-
-# Heart Disease Prediction Page
-if (selected == 'Heart Disease Prediction'):
-    
-    # page title
+# Heart Disease Prediction
+if selected == 'Heart Disease Prediction':
     st.title('Heart Disease Prediction using ML')
-    
+
     col1, col2, col3 = st.columns(3)
-    
+
     with col1:
-        age = st.number_input('Age')
-        
+        age = st.text_input('Age')
     with col2:
-        sex = st.number_input('Sex')
-        
+        sex = st.text_input('Sex (1 = Male, 0 = Female)')
     with col3:
-        cp = st.number_input('Chest Pain types')
-        
+        cp = st.text_input('Chest Pain types (0–3)')
     with col1:
-        trestbps = st.number_input('Resting Blood Pressure')
-        
+        trestbps = st.text_input('Resting Blood Pressure')
     with col2:
-        chol = st.number_input('Serum Cholestoral in mg/dl')
-        
+        chol = st.text_input('Serum Cholesterol (mg/dl)')
     with col3:
-        fbs = st.number_input('Fasting Blood Sugar > 120 mg/dl')
-        
+        fbs = st.text_input('Fasting Blood Sugar > 120 mg/dl (1 = True; 0 = False)')
     with col1:
-        restecg = st.number_input('Resting Electrocardiographic results')
-        
+        restecg = st.text_input('Resting ECG results (0–2)')
     with col2:
-        thalach = st.number_input('Maximum Heart Rate achieved')
-        
+        thalach = st.text_input('Max Heart Rate achieved')
     with col3:
-        exang = st.number_input('Exercise Induced Angina')
-        
+        exang = st.text_input('Exercise Induced Angina (1 = Yes; 0 = No)')
     with col1:
-        oldpeak = st.number_input('ST depression induced by exercise')
-        
+        oldpeak = st.text_input('ST depression')
     with col2:
-        slope = st.number_input('Slope of the peak exercise ST segment')
-        
+        slope = st.text_input('Slope of the ST segment (0–2)')
     with col3:
-        ca = st.number_input('Major vessels colored by flourosopy')
-        
+        ca = st.text_input('Major vessels colored by fluoroscopy (0–3)')
     with col1:
-        thal = st.number_input('thal: 0 = normal; 1 = fixed defect; 2 = reversable defect')
-        
-        
-     
-     
-    # code for Prediction
+        thal = st.text_input('Thal (1 = normal; 2 = fixed defect; 3 = reversible defect)')
+
     heart_diagnosis = ''
-    
-    # creating a button for Prediction
-    
+
     if st.button('Heart Disease Test Result'):
-        heart_prediction = heart_disease_model.predict([[age, sex, cp, trestbps, chol, fbs, restecg,thalach,exang,oldpeak,slope,ca,thal]])                          
-        
-        if (heart_prediction[0] == 1):
-          heart_diagnosis = 'The person is having heart disease'
-        else:
-          heart_diagnosis = 'The person does not have any heart disease'
-        
+        try:
+            input_data = np.array([[float(age), float(sex), float(cp), float(trestbps),
+                                    float(chol), float(fbs), float(restecg), float(thalach),
+                                    float(exang), float(oldpeak), float(slope), float(ca), float(thal)]])
+            prediction = heart_disease_model.predict(input_data)
+            heart_diagnosis = 'The person has heart disease' if prediction[0] == 1 else 'The person does not have heart disease'
+        except:
+            heart_diagnosis = "❗ Please enter valid numeric values."
+
     st.success(heart_diagnosis)
 
+# Liver Disease Prediction
+if selected == 'Liver Disease Prediction':
+    st.title('Liver Disease Prediction using ML')
 
-# Liver disease prediction page
-if(selected == 'Liver Disease Prediction'):
+    col1, col2, col3 = st.columns(3)
 
-  st.title("Liver disease Prediction using ML")
-  col1, col2, col3 = st.columns(3)
+    with col1:
+        Age = st.text_input('Age')
+    with col2:
+        Gender = st.selectbox('Gender', ('Male', 'Female'))
+    with col3:
+        Total_Bilirubin = st.text_input('Total Bilirubin')
+    with col1:
+        Direct_Bilirubin = st.text_input('Direct Bilirubin')
+    with col2:
+        Alkaline_Phosphotase = st.text_input('Alkaline Phosphotase')
+    with col3:
+        Alamine_Aminotransferase = st.text_input('Alamine Aminotransferase')
+    with col1:
+        Aspartate_Aminotransferase = st.text_input('Aspartate Aminotransferase')
+    with col2:
+        Total_Proteins = st.text_input('Total Proteins')
+    with col3:
+        Albumin = st.text_input('Albumin')
+    with col1:
+        Albumin_and_Globulin_Ratio = st.text_input('Albumin and Globulin Ratio')
 
-  with col1:
-    Age = st.text_input("Age")
-  with col2:
-    Gender = st.text_input("Gender: Male (0) or Female (1)")
-  with col3:
-    BMI = st.text_input("Body Mass Index")
+    liver_diagnosis = ''
 
-  with col1:
-    AlcoholConsumption = st.text_input("Alcohol consumption")
-  with col2:
-    Smoking = st.text_input("Smoking: No (0) or Yes (1) ")
-  with col3:
-    GeneticRisk = st.text_input("Genetic Risk: Low (0), Medium (1), High (2)")
-  with col1:
-    PhysicalActivity = st.text_input("Physical Activity")
-  with col2:
-    Diabetes = st.text_input("Diabetes: No (0) or Yes (1)")
-  with col3:
-    Hypertension = st.text_input("Hypertension: No (0) or Yes (1)")
-  with col1:
-    LiverFunctionTest = st.text_input("Liver Function Test")
-  # code for Prediction
-  liver_diagnosis = ''
-  if st.button("Liver Disease Test Result"):
-    # Convert inputs to numerical values (handle potential errors)
-    liver_prediction = liver_disease_model.predict([[Age,Gender,BMI,AlcoholConsumption,Smoking,GeneticRisk,PhysicalActivity,Diabetes,Hypertension,LiverFunctionTest]])
-    if (liver_prediction[0] == 1):
-      liver_diagnosis = "Person is having Liver disease"
-    else:
-      liver_diagnosis = "Person does not have any Liver disease"
-   
+    if st.button('Liver Disease Test Result'):
+        try:
+            gender_val = 1 if Gender == 'Male' else 0
+            input_data = np.array([[float(Age), gender_val, float(Total_Bilirubin), float(Direct_Bilirubin),
+                                    float(Alkaline_Phosphotase), float(Alamine_Aminotransferase),
+                                    float(Aspartate_Aminotransferase), float(Total_Proteins),
+                                    float(Albumin), float(Albumin_and_Globulin_Ratio)]])
+            prediction = liver_disease_model.predict(input_data)
+            liver_diagnosis = 'The person has liver disease' if prediction[0] == 1 else 'The person does not have liver disease'
+        except:
+            liver_diagnosis = "❗ Please enter valid numeric values."
 
-  st.success(liver_diagnosis)
-
-    
-    
-    
-
-
-    
-        
-    
+    st.success(liver_diagnosis)
