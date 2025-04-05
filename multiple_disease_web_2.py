@@ -6,7 +6,7 @@ from streamlit_option_menu import option_menu
 # Load the saved models
 diabetes_model = pickle.load(open('diabetes_saved_', 'rb'))
 heart_disease_model = pickle.load(open('heart_disease_saved', 'rb'))
-liver_disease_model = pickle.load(open('liver_saved_model.pkl', 'rb'))
+liver_disease_model = pickle.load(open('liver_disease_saved', 'rb'))
 
 # Sidebar navigation
 with st.sidebar:
